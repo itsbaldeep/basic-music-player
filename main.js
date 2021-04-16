@@ -7,6 +7,9 @@ const progress = document.querySelector(".progress");
 const progressContainer = document.querySelector(".progress-container");
 const title = document.querySelector("#title");
 const cover = document.querySelector(".cover");
+const mute = document.querySelector(".mute-btn");
+const rangeContainer = document.querySelector(".range-container");
+const range = document.querySelector(".range");
 
 const MAX = 15;
 
@@ -68,4 +71,44 @@ progressContainer.addEventListener("click", (e) => {
   const mouse = e.offsetX;
   const duration = audio.duration;
   audio.currentTime = (mouse / width) * duration;
+});
+
+// Function to change volume
+function changeVolume(e) {
+  const height = rangeContainer.clientHeight;
+  const mouse = e.offsetY;
+  audio.volume = mouse / height;
+  range.style.height = `${audio.volume * 100}%`;
+  if (audio.volume < 0.5) {
+    mute.classList.remove("fa-volume-up");
+    mute.classList.add("fa-volume-down");
+  } else {
+    mute.classList.remove("fa-volume-down");
+    mute.classList.add("fa-volume-up");
+  }
+}
+rangeContainer.addEventListener("click", changeVolume);
+
+// Mute event
+let muted = false;
+let vol;
+mute.addEventListener("click", () => {
+  if (!muted) {
+    vol = audio.volume;
+    audio.volume = 0;
+    range.style.backgroundColor = "#aaa";
+    mute.classList.remove("fa-volume-up");
+    mute.classList.add("fa-volume-off");
+    muted = true;
+    rangeContainer.removeEventListener("click", changeVolume);
+    rangeContainer.style.cursor = "default";
+  } else {
+    audio.volume = vol;
+    range.style.backgroundColor = "var(--progess-bar)";
+    mute.classList.remove("fa-volume-off");
+    mute.classList.add("fa-volume-up");
+    muted = false;
+    rangeContainer.addEventListener("click", changeVolume);
+    rangeContainer.style.cursor = "pointer";
+  }
 });
